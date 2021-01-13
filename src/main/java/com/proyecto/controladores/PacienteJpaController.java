@@ -30,8 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.proyecto.serviciosI.ServiciosPacienteI;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.web.bind.annotation.RequestBody;

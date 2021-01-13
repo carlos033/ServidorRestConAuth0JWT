@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  *
@@ -59,8 +61,6 @@ public class AutenticacionController {
         authenticationRequest.setIdentificador(authenticationRequest.getIdentificador().toLowerCase());
         final UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(authenticationRequest.getIdentificador());
         authenticate(authenticationRequest.getIdentificador(), authenticationRequest.getPassword(), userDetails.getAuthorities());
-        // We need to by pass security in the userService to retrieve the user, because we are not still authenticated...
-        // User user = usersService.findByUsername(authenticationRequest.getUsername(), false).get();
         String token = "";
         if (authenticationRequest.getIdentificador().toUpperCase().startsWith("M")) {
             Optional<Medico> optMedico = sMedico.buscarMedico(authenticationRequest.getIdentificador());
@@ -79,7 +79,7 @@ public class AutenticacionController {
         } catch (DisabledException e) {
             throw new Exception("USER_DISABLED", e);
         } catch (BadCredentialsException e) {
-            throw new Exception("INVALID_CREDENTIALS", e);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Credenciales invalidas");
         }
     }
 }

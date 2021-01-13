@@ -10,7 +10,7 @@ package com.proyecto.modelos;
  * @author ck
  */
 public interface Logable {
-    
+
     String getIdentifier();
-    
+
 }

@@ -12,14 +12,10 @@ import com.proyecto.modelos.Cita;
 import com.proyecto.modelos.Medico;
 import com.proyecto.utiles.Transformadores;
 import com.proyecto.serviciosI.ServiciosCitaI;
-import com.proyecto.serviciosI.ServiciosMedicoI;
-import com.proyecto.serviciosI.ServiciosPacienteI;
 import java.util.ArrayList;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +41,6 @@ public class CitasJpaController {
     private Transformadores transformador;
     @Autowired
     private ServiciosCitaI sCita;
-    @Autowired
-    private ServiciosMedicoI sMedico;
-    @Autowired
-    private ServiciosPacienteI sPaciente;
 
     @GetMapping()
     @ResponseBody

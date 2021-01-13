@@ -74,7 +74,6 @@ public class JwtToken implements Serializable {
             paciente = (Paciente) user;
             userMap.put("nombre", paciente.getNombre());
         }
-
         claims.put("usuario", userMap);
         return doGenerateToken(claims, userDetails.getUsername());
     }
