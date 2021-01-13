@@ -20,8 +20,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import com.proyecto.serviciosI.ServiciosInformeI;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
