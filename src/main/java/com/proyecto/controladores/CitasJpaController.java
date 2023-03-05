@@ -37,69 +37,69 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/citas")
 public class CitasJpaController {
 
-    @Autowired
-    private Transformadores transformador;
-    @Autowired
-    private ServiciosCitaI sCita;
+	@Autowired
+	private Transformadores transformador;
+	@Autowired
+	private ServiciosCitaI sCita;
 
-    @GetMapping()
-    @ResponseBody
-    public List<CitaDTO> listarCitas() {
-        List<Cita> listaCitas = new ArrayList<>();
-        listaCitas = sCita.buscarTodasC();
-        return listaCitas.stream().map(cita -> transformador.convertirADTOC(cita)).collect(Collectors.toList());
-    }
+	@GetMapping()
+	@ResponseBody
+	public List<CitaDTO> listarCitas() {
+		List<Cita> listaCitas = new ArrayList<>();
+		listaCitas = sCita.buscarTodasC();
+		return listaCitas.stream().map(cita -> transformador.convertirADTOC(cita)).collect(Collectors.toList());
+	}
 
-    @PostMapping
-    @ResponseBody
-    @ResponseStatus(HttpStatus.CREATED)
-    public CitaDTO aniadirCita(@Valid @RequestBody CitaDTO citaDto) {
-        Cita convertedCita = transformador.convertirAEntidadC(citaDto);
-        CitaDTO resultado;
-        try {
-            sCita.crearCita(convertedCita);
-        } catch (ExcepcionServicio ex) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
-        }
-        resultado = transformador.convertirADTOC(convertedCita);
-        return resultado;
-    }
+	@PostMapping
+	@ResponseBody
+	@ResponseStatus(HttpStatus.CREATED)
+	public CitaDTO aniadirCita(@Valid @RequestBody CitaDTO citaDto) {
+		Cita convertedCita = transformador.convertirAEntidadC(citaDto);
+		CitaDTO resultado;
+		try {
+			sCita.crearCita(convertedCita);
+		} catch (ExcepcionServicio ex) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
+		}
+		resultado = transformador.convertirADTOC(convertedCita);
+		return resultado;
+	}
 
-    @DeleteMapping(value = "/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminarCita(@PathVariable("id") int id) {
-        try {
-            sCita.eliminarCita(id);
-        } catch (ExcepcionServicio ex) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
-        }
-    }
+	@DeleteMapping(value = "/{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void eliminarCita(@PathVariable("id") int id) {
+		try {
+			sCita.eliminarCita(id);
+		} catch (ExcepcionServicio ex) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
+		}
+	}
 
-    @GetMapping("/{nSS}/buscarMMedico")
-    @ResponseBody
-    public MedicoDTO buscarMiMedico(@PathVariable("nSS") String nSS) {
-        MedicoDTO dto = null;
-        Medico m = null;
-        try {
-            m = sCita.buscarMiMedico(nSS);
-            dto = transformador.convertirADTOM(m);
-        } catch (ExcepcionServicio ex) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
-        }
-        return dto;
-    }
+	@GetMapping("/{nSS}/buscarMMedico")
+	@ResponseBody
+	public MedicoDTO buscarMiMedico(@PathVariable("nSS") String nSS) {
+		MedicoDTO dto = null;
+		Medico m = null;
+		try {
+			m = sCita.buscarMiMedico(nSS);
+			dto = transformador.convertirADTOM(m);
+		} catch (ExcepcionServicio ex) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+		}
+		return dto;
+	}
 
-    @GetMapping("/{id}/buscarXId")
-    @ResponseBody
-    public CitaDTO buscarXId(@PathVariable("id") int id) {
-        CitaDTO dto = null;
-        Cita cita = null;
-        try {
-            cita = sCita.buscarXId(id);
-            dto = transformador.convertirADTOC(cita);
-        } catch (ExcepcionServicio ex) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
-        }
-        return dto;
-    }
+	@GetMapping("/{id}/buscarXId")
+	@ResponseBody
+	public CitaDTO buscarXId(@PathVariable("id") int id) {
+		CitaDTO dto = null;
+		Cita cita = null;
+		try {
+			cita = sCita.buscarXId(id);
+			dto = transformador.convertirADTOC(cita);
+		} catch (ExcepcionServicio ex) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
+		}
+		return dto;
+	}
 }

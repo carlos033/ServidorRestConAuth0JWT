@@ -27,6 +27,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtToken implements Serializable {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
     public static final long JWT_TOKEN_VALIDITY = 30 * 60 * 60;
 
     @Value("${jwt.secret}")

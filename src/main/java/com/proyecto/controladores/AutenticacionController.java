@@ -41,45 +41,49 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/autenticacion")
 public class AutenticacionController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+	@Autowired
+	private AuthenticationManager authenticationManager;
 
-    @Autowired
-    private JwtToken jwtToken;
+	@Autowired
+	private JwtToken jwtToken;
 
-    @Autowired
-    private ServiciosJwtUsuarios jwtUserDetailsService;
+	@Autowired
+	private ServiciosJwtUsuarios jwtUserDetailsService;
 
-    @Autowired
-    private ServiciosMedico sMedico;
+	@Autowired
+	private ServiciosMedico sMedico;
 
-    @Autowired
-    private ServiciosPaciente sPaciente;
+	@Autowired
+	private ServiciosPaciente sPaciente;
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
-        authenticationRequest.setIdentificador(authenticationRequest.getIdentificador().toLowerCase());
-        final UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(authenticationRequest.getIdentificador());
-        authenticate(authenticationRequest.getIdentificador(), authenticationRequest.getPassword(), userDetails.getAuthorities());
-        String token = "";
-        if (authenticationRequest.getIdentificador().toUpperCase().startsWith("M")) {
-            Optional<Medico> optMedico = sMedico.buscarMedico(authenticationRequest.getIdentificador());
-            token = jwtToken.generarToken(userDetails, optMedico.get());
-        } else if (authenticationRequest.getIdentificador().toUpperCase().startsWith("ES")) {
-            Optional<Paciente> optPaciente = sPaciente.buscarPaciente(authenticationRequest.getIdentificador());
-            token = jwtToken.generarToken(userDetails, optPaciente.get());
-        }
-        return ResponseEntity.ok(new JwtResponse(token));
-    }
+	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
+		authenticationRequest.setIdentificador(authenticationRequest.getIdentificador().toLowerCase());
+		final UserDetails userDetails = jwtUserDetailsService
+				.loadUserByUsername(authenticationRequest.getIdentificador());
+		authenticate(authenticationRequest.getIdentificador(), authenticationRequest.getPassword(),
+				userDetails.getAuthorities());
+		String token = "";
+		if (authenticationRequest.getIdentificador().toUpperCase().startsWith("M")) {
+			Optional<Medico> optMedico = sMedico.buscarMedico(authenticationRequest.getIdentificador());
+			token = jwtToken.generarToken(userDetails, optMedico.get());
+		} else if (authenticationRequest.getIdentificador().toUpperCase().startsWith("ES")) {
+			Optional<Paciente> optPaciente = sPaciente.buscarPaciente(authenticationRequest.getIdentificador());
+			token = jwtToken.generarToken(userDetails, optPaciente.get());
+		}
+		return ResponseEntity.ok(new JwtResponse(token));
+	}
 
-    @Transactional
-    private void authenticate(String username, String password, Collection<? extends GrantedAuthority> authorities) throws Exception {
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password, authorities));
-        } catch (DisabledException e) {
-            throw new Exception("USER_DISABLED", e);
-        } catch (BadCredentialsException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Credenciales invalidas");
-        }
-    }
+	@Transactional
+	private void authenticate(String username, String password, Collection<? extends GrantedAuthority> authorities)
+			throws Exception {
+		try {
+			authenticationManager
+					.authenticate(new UsernamePasswordAuthenticationToken(username, password, authorities));
+		} catch (DisabledException e) {
+			throw new Exception("USER_DISABLED", e);
+		} catch (BadCredentialsException e) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Credenciales invalidas");
+		}
+	}
 }

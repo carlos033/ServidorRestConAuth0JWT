@@ -36,43 +36,43 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping(path = "/informes")
 public class InformesJpaController {
 
-    @Autowired
-    private Transformadores transformador;
-    @Autowired
-    private ServiciosInformeI sInformes;
+	@Autowired
+	private Transformadores transformador;
+	@Autowired
+	private ServiciosInformeI sInformes;
 
-    @PostMapping
-    @ResponseBody
-    @ResponseStatus(HttpStatus.CREATED)
-    public InformeMedicoDTO aniadirInforme(@Valid @RequestBody InformeCompletoDTO informeDto) {
-        InformeMedicoDTO resultado;
-        Informe convertedInforme = transformador.convertirAEntidadI(informeDto);
-        try {
-            sInformes.crearInforme(convertedInforme);
-        } catch (ExcepcionServicio ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
-        }
+	@PostMapping
+	@ResponseBody
+	@ResponseStatus(HttpStatus.CREATED)
+	public InformeMedicoDTO aniadirInforme(@Valid @RequestBody InformeCompletoDTO informeDto) {
+		InformeMedicoDTO resultado;
+		Informe convertedInforme = transformador.convertirAEntidadI(informeDto);
+		try {
+			sInformes.crearInforme(convertedInforme);
+		} catch (ExcepcionServicio ex) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+		}
 
-        resultado = transformador.convertirADTOIM(convertedInforme);
-        return resultado;
-    }
+		resultado = transformador.convertirADTOIM(convertedInforme);
+		return resultado;
+	}
 
-    @DeleteMapping("/{nombre}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminarInforme(@PathVariable("nombre") String nombre) {
-        try {
-            sInformes.eliminarInforme(nombre);
-        } catch (ExcepcionServicio ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
-        }
-    }
+	@DeleteMapping("/{nombre}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void eliminarInforme(@PathVariable("nombre") String nombre) {
+		try {
+			sInformes.eliminarInforme(nombre);
+		} catch (ExcepcionServicio ex) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+		}
+	}
 
-    @GetMapping
-    @ResponseBody
-    public List<InformeDTO> listInformes() {
-        List<Informe> listaInformes = sInformes.buscarTodosI();
-        return listaInformes.stream().map(informe
-                -> transformador.convertirADTOI(informe)).collect(Collectors.toList());
-    }
+	@GetMapping
+	@ResponseBody
+	public List<InformeDTO> listInformes() {
+		List<Informe> listaInformes = sInformes.buscarTodosI();
+		return listaInformes.stream().map(informe -> transformador.convertirADTOI(informe))
+				.collect(Collectors.toList());
+	}
 
 }

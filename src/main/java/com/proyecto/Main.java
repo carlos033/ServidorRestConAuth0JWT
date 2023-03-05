@@ -1,6 +1,8 @@
 package com.proyecto;
 
 import com.proyecto.utiles.PrecargaBD;
+
+import org.springdoc.core.GroupedOpenApi;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -23,5 +25,8 @@ public class Main {
             myDatabaseSeeder.precargarBaseDeDatos();
         };
     }
-
+    @Bean
+    public GroupedOpenApi publicApi() {
+    return GroupedOpenApi.builder().group("springshop-public").packagesToScan("com.proyecto").build();
+    }
 }

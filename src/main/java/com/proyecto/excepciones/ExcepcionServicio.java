@@ -11,7 +11,12 @@ package com.proyecto.excepciones;
  */
 public class ExcepcionServicio extends Exception {
 
-    public ExcepcionServicio(String msg) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public ExcepcionServicio(String msg) {
         super("Ha ocurrido una excepcion en el servicio: " + msg);
     }
 }

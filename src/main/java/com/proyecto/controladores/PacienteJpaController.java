@@ -43,84 +43,84 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping(path = "/pacientes")
 public class PacienteJpaController {
 
-    @Autowired
-    private Transformadores transformador;
-    @Autowired
-    private ServiciosPacienteI sPaciente;
-    @Autowired
-    private ServiciosCitaI sCita;
-    @Autowired
-    private ServiciosInformeI sInformes;
+	@Autowired
+	private Transformadores transformador;
+	@Autowired
+	private ServiciosPacienteI sPaciente;
+	@Autowired
+	private ServiciosCitaI sCita;
+	@Autowired
+	private ServiciosInformeI sInformes;
 
-    @PostMapping
-    @ResponseBody
-    @ResponseStatus(HttpStatus.CREATED)
-    public PacienteDTO aniadirPaciente(@Valid @RequestBody PacienteDTO pacienteDTO) {
-        Paciente paciente = transformador.convertirAEntidadP(pacienteDTO);
-        PacienteDTO resultado;
-        sPaciente.savePaciente(paciente);
-        resultado = transformador.convertirADTOP(paciente);
-        return resultado;
-    }
+	@PostMapping
+	@ResponseBody
+	@ResponseStatus(HttpStatus.CREATED)
+	public PacienteDTO aniadirPaciente(@Valid @RequestBody PacienteDTO pacienteDTO) {
+		Paciente paciente = transformador.convertirAEntidadP(pacienteDTO);
+		PacienteDTO resultado;
+		sPaciente.savePaciente(paciente);
+		resultado = transformador.convertirADTOP(paciente);
+		return resultado;
+	}
 
-    @DeleteMapping("/{nSS}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminarPaciente(@PathVariable("nSS") String nSS) {
-        try {
-            sCita.eliminarTodasXPaciente(nSS);
-            sPaciente.eliminarPaciente(nSS);
-        } catch (ExcepcionServicio ex) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
-        }
-    }
+	@DeleteMapping("/{nSS}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void eliminarPaciente(@PathVariable("nSS") String nSS) {
+		try {
+			sCita.eliminarTodasXPaciente(nSS);
+			sPaciente.eliminarPaciente(nSS);
+		} catch (ExcepcionServicio ex) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
+		}
+	}
 
-    @GetMapping
-    @ResponseBody
-    public List<PacienteDTO> listPacientes() {
-        List<Paciente> listaPacientes = sPaciente.buscarTodosP();
-        return listaPacientes.stream().map(transformador::convertirADTOP).collect(Collectors.toList());
-    }
+	@GetMapping
+	@ResponseBody
+	public List<PacienteDTO> listPacientes() {
+		List<Paciente> listaPacientes = sPaciente.buscarTodosP();
+		return listaPacientes.stream().map(transformador::convertirADTOP).collect(Collectors.toList());
+	}
 
-    @GetMapping("/{nSS}")
-    @ResponseBody
-    public PacienteDTO buscarPaciente(@RequestParam String nSS) {
-        Optional<Paciente> optPaciente = Optional.empty();
-        try {
-            optPaciente = sPaciente.buscarPaciente(nSS);
-        } catch (ExcepcionServicio ex) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
-        }
-        return transformador.convertirADTOP(optPaciente.get());
-    }
+	@GetMapping("/{nSS}")
+	@ResponseBody
+	public PacienteDTO buscarPaciente(@RequestParam String nSS) {
+		Optional<Paciente> optPaciente = Optional.empty();
+		try {
+			optPaciente = sPaciente.buscarPaciente(nSS);
+		} catch (ExcepcionServicio ex) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
+		}
+		return transformador.convertirADTOP(optPaciente.get());
+	}
 
-    @GetMapping("/{nSS}/citas")
-    @ResponseBody
-    public List<CitaDTO> buscarCitasPaciente(@PathVariable("nSS") String nSS) {
-        List<CitaDTO> citasDtos = new ArrayList<>();
-        try {
-            List<Cita> citas = sCita.buscarXPaciente(nSS);
-            if (citas != null) {
-                citas.forEach(cita -> {
-                    citasDtos.add(transformador.convertirADTOC(cita));
-                });
-            }
-        } catch (ExcepcionServicio ex) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
-        }
-        return citasDtos;
-    }
+	@GetMapping("/{nSS}/citas")
+	@ResponseBody
+	public List<CitaDTO> buscarCitasPaciente(@PathVariable("nSS") String nSS) {
+		List<CitaDTO> citasDtos = new ArrayList<>();
+		try {
+			List<Cita> citas = sCita.buscarXPaciente(nSS);
+			if (citas != null) {
+				citas.forEach(cita -> {
+					citasDtos.add(transformador.convertirADTOC(cita));
+				});
+			}
+		} catch (ExcepcionServicio ex) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
+		}
+		return citasDtos;
+	}
 
-    @GetMapping("/{nSS}/informes")
-    @ResponseBody
-    public List<InformePacienteDTO> buscarInformesXPaciente(@PathVariable("nSS") String nSS) {
-        List<Informe> listaInformes = new ArrayList<>();
-        try {
-            listaInformes = sInformes.buscarInformesXPaciente(nSS);
-        } catch (ExcepcionServicio ex) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
-        }
-        return listaInformes.stream().map(informe
-                -> transformador.convertirADTOIP(informe)).collect(Collectors.toList());
-    }
+	@GetMapping("/{nSS}/informes")
+	@ResponseBody
+	public List<InformePacienteDTO> buscarInformesXPaciente(@PathVariable("nSS") String nSS) {
+		List<Informe> listaInformes = new ArrayList<>();
+		try {
+			listaInformes = sInformes.buscarInformesXPaciente(nSS);
+		} catch (ExcepcionServicio ex) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
+		}
+		return listaInformes.stream().map(informe -> transformador.convertirADTOIP(informe))
+				.collect(Collectors.toList());
+	}
 
 }

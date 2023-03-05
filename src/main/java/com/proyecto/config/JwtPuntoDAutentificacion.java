@@ -12,12 +12,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author ck
  */
+@Component
 public class JwtPuntoDAutentificacion implements AuthenticationEntryPoint, Serializable {
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 3953393557364359797L;
 
     @Override
     public void commence(HttpServletRequest request,

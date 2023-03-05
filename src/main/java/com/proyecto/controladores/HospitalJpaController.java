@@ -35,45 +35,46 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping(path = "/hospitales")
 public class HospitalJpaController {
 
-    @Autowired
-    private Transformadores transformador;
-    @Autowired
-    private ServiciosHospitalI sHospital;
+	@Autowired
+	private Transformadores transformador;
+	@Autowired
+	private ServiciosHospitalI sHospital;
 
-    @PostMapping
-    @ResponseBody
-    @ResponseStatus(HttpStatus.CREATED)
-    public HospitalDTO aniadirHospital(@Valid @RequestBody HospitalDTO hospitalDto) {
-        Hospital hospital1 = transformador.convertirAEntidadH(hospitalDto);
-        sHospital.save(hospital1);
-        HospitalDTO resultado = transformador.convertirADTOH(hospital1);
-        return resultado;
-    }
+	@PostMapping
+	@ResponseBody
+	@ResponseStatus(HttpStatus.CREATED)
+	public HospitalDTO aniadirHospital(@Valid @RequestBody HospitalDTO hospitalDto) {
+		Hospital hospital1 = transformador.convertirAEntidadH(hospitalDto);
+		sHospital.save(hospital1);
+		HospitalDTO resultado = transformador.convertirADTOH(hospital1);
+		return resultado;
+	}
 
-    @DeleteMapping("/{nombre}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminarHospital(@PathVariable("nombre") String nombreHos) {
-        try {
-            sHospital.eliminarHospital(nombreHos);
-        } catch (ExcepcionServicio ex) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Hospital no encontrado");
-        }
-    }
+	@DeleteMapping("/{nombre}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void eliminarHospital(@PathVariable("nombre") String nombreHos) {
+		try {
+			sHospital.eliminarHospital(nombreHos);
+		} catch (ExcepcionServicio ex) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Hospital no encontrado");
+		}
+	}
 
-    @GetMapping()
-    @ResponseBody
-    public List<HospitalDTO> listarhospitales() {
-        List<Hospital> listaHospital = sHospital.buscarTodosH();
-        return listaHospital.stream().map(hospital -> transformador.convertirADTOH(hospital)).collect(Collectors.toList());
-    }
+	@GetMapping()
+	@ResponseBody
+	public List<HospitalDTO> listarhospitales() {
+		List<Hospital> listaHospital = sHospital.buscarTodosH();
+		return listaHospital.stream().map((Hospital hospital) -> transformador.convertirADTOH(hospital))
+				.collect(Collectors.toList());
+	}
 
-    @GetMapping("{nombre}")
-    @ResponseBody
-    public HospitalDTO buscarHospital(@PathVariable("nombre") String nombre) throws ExcepcionServicio {
-        Optional<Hospital> optHospital = sHospital.buscarHospital(nombre);
-        if (!optHospital.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Hospital no encontrado");
-        }
-        return transformador.convertirADTOH(optHospital.get());
-    }
+	@GetMapping("{nombre}")
+	@ResponseBody
+	public HospitalDTO buscarHospital(@PathVariable("nombre") String nombre) throws ExcepcionServicio {
+		Optional<Hospital> optHospital = sHospital.buscarHospital(nombre);
+		if (!optHospital.isPresent()) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Hospital no encontrado");
+		}
+		return transformador.convertirADTOH(optHospital.get());
+	}
 }

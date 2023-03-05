@@ -13,7 +13,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 public class InformePacienteDTO extends InformeDTO {
 
-    @JsonIgnoreProperties("listaInformes")
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	@JsonIgnoreProperties("listaInformes")
     private MedicoDTO medico;
 
     public InformePacienteDTO() {
