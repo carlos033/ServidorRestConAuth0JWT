@@ -5,6 +5,27 @@
  */
 package com.proyecto.controladores;
 
+import java.util.Collection;
+import java.util.Optional;
+
+import javax.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.proyecto.config.JwtToken;
 import com.proyecto.dto.jwt.JwtRequest;
 import com.proyecto.dto.jwt.JwtResponse;
@@ -13,24 +34,6 @@ import com.proyecto.modelos.Paciente;
 import com.proyecto.servicios.ServiciosJwtUsuarios;
 import com.proyecto.servicios.ServiciosMedico;
 import com.proyecto.servicios.ServiciosPaciente;
-import java.util.Collection;
-import java.util.Optional;
-import javax.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  *
@@ -42,7 +45,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class AutenticacionController {
 
 	@Autowired
-	private AuthenticationManager authenticationManager;
+	private DaoAuthenticationProvider authenticationManager;
 
 	@Autowired
 	private JwtToken jwtToken;
@@ -56,7 +59,7 @@ public class AutenticacionController {
 	@Autowired
 	private ServiciosPaciente sPaciente;
 
-	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	@PostMapping("/login")
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
 		authenticationRequest.setIdentificador(authenticationRequest.getIdentificador().toLowerCase());
 		final UserDetails userDetails = jwtUserDetailsService

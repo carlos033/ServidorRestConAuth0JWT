@@ -24,74 +24,73 @@ import org.springframework.stereotype.Service;
  * @author ck
  */
 @Service("ServiciosMedicoI")
-@Transactional
 public class ServiciosMedico implements ServiciosMedicoI {
 
-    @Autowired
-    private MedicoRepository repositorioM;
-    @Autowired
-    private HospitalRepository repositorioH;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+	@Autowired
+	private MedicoRepository repositorioM;
+	@Autowired
+	private HospitalRepository repositorioH;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
-    @Override
-    public List<Medico> buscarTodosM() {
-        return repositorioM.findAll();
-    }
+	@Override
+	public List<Medico> buscarTodosM() {
+		return repositorioM.findAll();
+	}
 
-    @Override
-    public void saveMedico(Medico medico1) {
-        medico1.setPassword(passwordEncoder.encode(medico1.getPassword()));
-        repositorioM.save(medico1);
-    }
+	@Override
+	@Transactional
+	public void saveMedico(Medico medico1) {
+		medico1.setPassword(passwordEncoder.encode(medico1.getPassword()));
+		repositorioM.save(medico1);
+	}
 
-    @Override
-    public void eliminarMedico(String nLicencia) throws ExcepcionServicio {
-        Optional<Medico> optMedico = repositorioM.findById(nLicencia);
-        if (!optMedico.isPresent()) {
-            throw new ExcepcionServicio("El numero de Licencia no existe");
-        }
-        repositorioM.deleteById(nLicencia);
-    }
+	@Override
+	public void eliminarMedico(String nLicencia) throws ExcepcionServicio {
+		Optional<Medico> optMedico = repositorioM.findById(nLicencia);
+		if (!optMedico.isPresent()) {
+			throw new ExcepcionServicio("El numero de Licencia no existe");
+		}
+		repositorioM.deleteById(nLicencia);
+	}
 
-    @Override
-    public Optional<Medico> buscarMedico(String nLicencia) throws ExcepcionServicio {
-        Optional<Medico> optMedico = repositorioM.findById(nLicencia);
-        if (!optMedico.isPresent()) {
-            throw new ExcepcionServicio("El numero de Licencia no existe");
-        }
-        return optMedico;
-    }
+	@Override
+	public Optional<Medico> buscarMedico(String nLicencia) throws ExcepcionServicio {
+		Optional<Medico> optMedico = repositorioM.findById(nLicencia);
+		if (!optMedico.isPresent()) {
+			throw new ExcepcionServicio("El numero de Licencia no existe");
+		}
+		return optMedico;
+	}
 
-    @Override
-    public List<Paciente> BuscarPacientesXMedico(String nLicencia) throws ExcepcionServicio {
-        List<Paciente> listaPacientes = repositorioM.BuscarPacientesXMedico(nLicencia);
-        if (listaPacientes.isEmpty()) {
-            throw new ExcepcionServicio("El numero de Licencia no existe");
-        }
-        return listaPacientes;
-    }
+	@Override
+	public List<Paciente> BuscarPacientesXMedico(String nLicencia) throws ExcepcionServicio {
+		List<Paciente> listaPacientes = repositorioM.BuscarPacientesXMedico(nLicencia);
+		if (listaPacientes.isEmpty()) {
+			throw new ExcepcionServicio("El numero de Licencia no existe");
+		}
+		return listaPacientes;
+	}
 
-    @Override
-    public List<Medico> BuscarMedicoXEspecialidad(String especialidad,
-            String hospital) throws ExcepcionServicio {
-        Optional<Hospital> optHospital = repositorioH.findById(hospital);
-        if (!optHospital.isPresent()) {
-            throw new ExcepcionServicio("El hospital no existe");
-        }
-        List<Medico> listaMedico = repositorioM.BuscarMedicoXEspecialidad(especialidad, hospital);
-        if (listaMedico.isEmpty()) {
-            throw new ExcepcionServicio("No hay medicos con esa especialidad");
-        }
-        return listaMedico;
-    }
+	@Override
+	public List<Medico> BuscarMedicoXEspecialidad(String especialidad, String hospital) throws ExcepcionServicio {
+		Optional<Hospital> optHospital = repositorioH.findById(hospital);
+		if (!optHospital.isPresent()) {
+			throw new ExcepcionServicio("El hospital no existe");
+		}
+		List<Medico> listaMedico = repositorioM.BuscarMedicoXEspecialidad(especialidad, hospital);
+		if (listaMedico.isEmpty()) {
+			throw new ExcepcionServicio("No hay medicos con esa especialidad");
+		}
+		return listaMedico;
+	}
 
-    @Override
-    public List<Medico> BuscarMedicosXHospital(String hospital) throws ExcepcionServicio {
-        List<Medico> listaMedico = repositorioM.BuscarMedicosXHospital(hospital);
-        if (listaMedico.isEmpty()) {
-            throw new ExcepcionServicio("No hay medicos en el hospital");
-        }
-        return listaMedico;
-    }
+	@Override
+	public List<Medico> BuscarMedicosXHospital(String hospital) throws ExcepcionServicio {
+		List<Medico> listaMedico = repositorioM.BuscarMedicosXHospital(hospital);
+		if (listaMedico.isEmpty()) {
+			throw new ExcepcionServicio("No hay medicos en el hospital");
+		}
+		return listaMedico;
+	}
 }
