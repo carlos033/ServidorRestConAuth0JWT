@@ -5,28 +5,31 @@
  */
 package com.proyecto.controladores;
 
-import com.proyecto.dto.InformeDTO;
-import com.proyecto.dto.InformeMedicoDTO;
-import com.proyecto.dto.InformeCompletoDTO;
-import com.proyecto.excepciones.ExcepcionServicio;
-import com.proyecto.modelos.Informe;
-import com.proyecto.utiles.Transformadores;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import com.proyecto.serviciosI.ServiciosInformeI;
-import java.util.stream.Collectors;
-import javax.validation.Valid;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
+
+import com.proyecto.dto.InformeCompletoDTO;
+import com.proyecto.dto.InformeDTO;
+import com.proyecto.dto.InformeMedicoDTO;
+import com.proyecto.excepciones.ExcepcionServicio;
+import com.proyecto.modelos.Informe;
+import com.proyecto.serviciosI.ServiciosInformeI;
+import com.proyecto.utiles.Transformadores;
 
 /**
  *
@@ -71,7 +74,7 @@ public class InformesJpaController {
 	@ResponseBody
 	public List<InformeDTO> listInformes() {
 		List<Informe> listaInformes = sInformes.buscarTodosI();
-		return listaInformes.stream().map(informe -> transformador.convertirADTOI(informe))
+		return listaInformes.stream().map(transformador::convertirADTOI)
 				.collect(Collectors.toList());
 	}
 

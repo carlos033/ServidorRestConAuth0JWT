@@ -5,10 +5,11 @@
  */
 package com.proyecto.serviciosI;
 
+import java.util.List;
+
 import com.proyecto.excepciones.ExcepcionServicio;
 import com.proyecto.modelos.Cita;
 import com.proyecto.modelos.Medico;
-import java.util.List;
 
 /**
  *

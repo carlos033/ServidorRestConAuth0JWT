@@ -5,15 +5,12 @@
  */
 package com.proyecto.controladores;
 
-import com.proyecto.dto.HospitalDTO;
-import com.proyecto.excepciones.ExcepcionServicio;
-import com.proyecto.modelos.Hospital;
-import com.proyecto.utiles.Transformadores;
-import com.proyecto.serviciosI.ServiciosHospitalI;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,6 +23,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+
+import com.proyecto.dto.HospitalDTO;
+import com.proyecto.excepciones.ExcepcionServicio;
+import com.proyecto.modelos.Hospital;
+import com.proyecto.serviciosI.ServiciosHospitalI;
+import com.proyecto.utiles.Transformadores;
 
 /**
  *
@@ -64,7 +67,7 @@ public class HospitalJpaController {
 	@ResponseBody
 	public List<HospitalDTO> listarhospitales() {
 		List<Hospital> listaHospital = sHospital.buscarTodosH();
-		return listaHospital.stream().map((Hospital hospital) -> transformador.convertirADTOH(hospital))
+		return listaHospital.stream().map(transformador::convertirADTOH)
 				.collect(Collectors.toList());
 	}
 

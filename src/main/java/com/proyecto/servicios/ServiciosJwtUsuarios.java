@@ -5,19 +5,21 @@
  */
 package com.proyecto.servicios;
 
-import com.proyecto.modelos.Medico;
-import com.proyecto.modelos.Paciente;
-import com.proyecto.repositorios.MedicoRepository;
-import com.proyecto.repositorios.PacienteRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import com.proyecto.modelos.Medico;
+import com.proyecto.modelos.Paciente;
+import com.proyecto.repositorios.MedicoRepository;
+import com.proyecto.repositorios.PacienteRepository;
 
 /**
  *
@@ -58,7 +60,7 @@ public class ServiciosJwtUsuarios implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String identificador) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String identificador) {
         if (identificador.startsWith("m")) {
             return cargarMedicoPorIdentificador(identificador);
         } else if (identificador.startsWith("es")) {

@@ -20,9 +20,7 @@ public class Main {
 
 	@Bean
 	InitializingBean seedDatabase() {
-		return () -> {
-			myDatabaseSeeder.precargarBaseDeDatos();
-		};
+		return myDatabaseSeeder::precargarBaseDeDatos;
 	}
 
 }
