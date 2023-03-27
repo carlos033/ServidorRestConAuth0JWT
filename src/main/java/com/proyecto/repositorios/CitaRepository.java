@@ -19,7 +19,7 @@ import org.springframework.stereotype.Repository;
  *
  * @author ck
  */
-@Repository
+
 public interface CitaRepository extends JpaRepository<Cita, Integer> {
 
     String sqlBuscarMedicoCabecera = "Select m from Medico as m join m.listaCitas as medicocitas "

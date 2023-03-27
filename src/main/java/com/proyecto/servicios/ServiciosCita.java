@@ -114,7 +114,7 @@ public class ServiciosCita implements ServiciosCitaI {
         if (listaCitas == null) {
             throw new ExcepcionServicio("El numero de SS no existe");
         }
-        repositorioC.deleteInBatch(listaCitas);
+        repositorioC.deleteAllInBatch(listaCitas);
     }
 
     @Override

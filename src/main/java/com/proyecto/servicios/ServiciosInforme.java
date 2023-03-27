@@ -74,7 +74,7 @@ public class ServiciosInforme implements ServiciosInformeI {
     @Override
     public void eliminarTodosXPaciente(String nSS) throws ExcepcionServicio {
         List<Informe> listaCitas = buscarInformesXPaciente(nSS);
-        repositorioI.deleteInBatch(listaCitas);
+        repositorioI.deleteAllInBatch(listaCitas);
     }
 
     @Override

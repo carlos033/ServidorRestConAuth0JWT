@@ -16,7 +16,6 @@ import org.springframework.stereotype.Repository;
  *
  * @author ck
  */
-@Repository
 public interface InformeRepository extends JpaRepository<Informe, String> {
 
     @Query("Select i from Informe i where i.paciente.nSS = :nSS")

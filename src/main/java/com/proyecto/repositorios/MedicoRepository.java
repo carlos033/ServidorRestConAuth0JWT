@@ -17,7 +17,6 @@ import org.springframework.stereotype.Repository;
  *
  * @author ck
  */
-@Repository
 public interface MedicoRepository extends JpaRepository<Medico, String> {
 
     String BuscarPacientesXMedico = "Select p.listaCitas from Paciente as p join p.listaCitas as pacientecitas "
