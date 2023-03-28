@@ -40,7 +40,7 @@ public class ServiciosJwtUsuarios implements UserDetailsService {
             throw new UsernameNotFoundException("Usuario no encontrado con identificador: " + identificador);
         }
         Medico m = optMedico.get();
-        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+        List<GrantedAuthority> authorities = new ArrayList<>();
         return new org.springframework.security.core.userdetails.User(
                 m.getnLicencia(),
                 m.getPassword(),
