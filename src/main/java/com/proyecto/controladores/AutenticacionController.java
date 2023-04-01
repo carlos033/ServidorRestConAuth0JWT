@@ -69,10 +69,20 @@ public class AutenticacionController {
 		String token = "";
 		if (authenticationRequest.getIdentificador().toUpperCase().startsWith("M")) {
 			Optional<Medico> optMedico = sMedico.buscarMedico(authenticationRequest.getIdentificador());
-			token = jwtToken.generarToken(userDetails, optMedico.get());
+			if (optMedico.isPresent()) {
+				token = jwtToken.generarToken(optMedico.get());
+			} else {
+				throw new Exception(
+						"No se encontró el médico con identificador " + authenticationRequest.getIdentificador());
+			}
 		} else if (authenticationRequest.getIdentificador().toUpperCase().startsWith("ES")) {
 			Optional<Paciente> optPaciente = sPaciente.buscarPaciente(authenticationRequest.getIdentificador());
-			token = jwtToken.generarToken(userDetails, optPaciente.get());
+			if (optPaciente.isPresent()) {
+				token = jwtToken.generarToken(optPaciente.get());
+			} else {
+				throw new Exception(
+						"No se encontró el paciente con identificador " + authenticationRequest.getIdentificador());
+			}
 		}
 		return ResponseEntity.ok(new JwtResponse(token));
 	}

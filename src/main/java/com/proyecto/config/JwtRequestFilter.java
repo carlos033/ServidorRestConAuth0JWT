@@ -20,9 +20,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.proyecto.servicios.ServiciosJwtUsuarios;
-
-import io.jsonwebtoken.ExpiredJwtException;
 
 /**
  *
@@ -33,6 +32,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 	@Autowired
 	private ServiciosJwtUsuarios jwtUserDetailsService;
+
+	@Autowired
 	private final JwtToken jwtTokenUtil;
 
 	public JwtRequestFilter(JwtToken jwtTokenUtil) {
@@ -48,14 +49,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
 			jwtToken = requestTokenHeader.substring(7);
 			try {
+				System.out.println(
+						"\n\n" + jwtToken + "\n\n");
 				identifier = jwtTokenUtil.obtenerIdentificadorDelToken(jwtToken);
-			} catch (IllegalArgumentException | ExpiredJwtException e) {
-				logger.error("Unable to get JWT Token or JWT Token has expired");
+			} catch (JWTDecodeException exception) {
+				logger.error("No se pudo obtener el token JWT o el token JWT ha expirado", exception);
 			}
 		}
 		if (identifier != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 			UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(identifier);
-			if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
+			if (jwtTokenUtil.validateToken(jwtToken, identifier)) {
 				UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
 						userDetails, null, userDetails.getAuthorities());
 				usernamePasswordAuthenticationToken

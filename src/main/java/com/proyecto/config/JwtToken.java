@@ -1,45 +1,25 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.proyecto.config;
 
-import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.util.Date;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import javax.crypto.spec.SecretKeySpec;
-
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.proyecto.modelos.Logable;
 import com.proyecto.modelos.Medico;
 import com.proyecto.modelos.Paciente;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-
-/**
- *
- * @author ck
- */
 @Component
-public class JwtToken implements Serializable {
-
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
-
-	public static final long JWT_TOKEN_VALIDITY = 30 * 60 * 60;
+public class JwtToken {
 
 	private final String secret;
 
@@ -48,37 +28,42 @@ public class JwtToken implements Serializable {
 	}
 
 	public String obtenerIdentificadorDelToken(String token) {
-		return getClaimFromToken(token, Claims::getSubject);
+		return getClaimFromToken(token, DecodedJWT::getSubject);
 	}
 
-	public Date ObtenerVencimientoDelToken(String token) {
-		return getClaimFromToken(token, Claims::getExpiration);
+	public Instant obtenerVencimientoDelToken(String token) {
+		return getClaimFromToken(token, DecodedJWT::getExpiresAt).toInstant();
 	}
 
-	public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
-		final Claims claims = getAllClaimsFromToken(token);
-		return claimsResolver.apply(claims);
+	public <T> T getClaimFromToken(String token, Function<DecodedJWT, T> claimsResolver) {
+		final DecodedJWT decodedJWT = decodeToken(token);
+		return claimsResolver.apply(decodedJWT);
 	}
 
-	private Claims getAllClaimsFromToken(String token) {
-		return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+	private DecodedJWT decodeToken(String token) {
+		try {
+			JWTVerifier verifier = JWT.require(Algorithm.HMAC512(secret)).build();
+			DecodedJWT jwt = verifier.verify(token);
+			return jwt;
+		} catch (JWTDecodeException exception) {
+			throw new RuntimeException("Error decodificando el token", exception);
+		}
 	}
 
-	private Boolean aExpiradoElToken(String token) {
-		final Date expiration = ObtenerVencimientoDelToken(token);
-		return expiration.before(new Date());
+	private Boolean haExpiradoElToken(String token) {
+		final Instant expiration = obtenerVencimientoDelToken(token);
+		return expiration.isBefore(Instant.now());
 	}
 
-	@SuppressWarnings("unchecked")
 	public boolean esMedico(String token) {
-		Claims claims = getAllClaimsFromToken(token);
-		Map<String, Object> userMap = (HashMap<String, Object>) claims.get("usuario");
+		final DecodedJWT decodedJWT = decodeToken(token);
+		final Map<String, Object> userMap = decodedJWT.getClaim("usuario").asMap();
 		return userMap.get("licencia") != null;
 	}
 
-	public String generarToken(UserDetails userDetails, Logable user) {
-		Map<String, Object> claims = new HashMap<>();
-		Map<String, Object> userMap = new HashMap<>();
+	public String generarToken(Logable user) {
+		final Map<String, Object> claims = new HashMap<>();
+		final Map<String, Object> userMap = new HashMap<>();
 		Medico medico = null;
 		Paciente paciente = null;
 		if (user instanceof Medico) {
@@ -90,22 +75,27 @@ public class JwtToken implements Serializable {
 			paciente = (Paciente) user;
 			userMap.put("nombre", paciente.getNombre());
 		}
-		claims.put("usuario", userMap);
-		return doGenerateToken(claims, userDetails.getUsername());
+		claims.put("usuario", new HashMap<>(userMap));
+		return doGenerateToken(claims);
 	}
 
-	private String doGenerateToken(Map<String, Object> claims, String subject) {
-		byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
-		Key signingKey = new SecretKeySpec(keyBytes, SignatureAlgorithm.HS512.getJcaName());
-
-		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date())
-				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
-				.signWith(SignatureAlgorithm.HS512, signingKey).compact();
+	private String doGenerateToken(Map<String, Object> claims) {
+		final Algorithm algorithm = Algorithm.HMAC512(secret);
+		final Instant now = Instant.now();
+		final Instant expirationTime = Instant.now().plus(Duration.ofDays(1));
+		Map<String, Object> usuarioClaims = new HashMap<>();
+		Map<String, Object> originalUsuarioClaims = (Map<String, Object>) claims.get("usuario");
+		usuarioClaims.putAll(originalUsuarioClaims);
+		return JWT.create().withIssuedAt(now).withExpiresAt(expirationTime).withClaim("usuario", usuarioClaims)
+				.sign(algorithm);
 	}
 
-	public Boolean validateToken(String token, UserDetails userDetails) {
-		final String identifier = obtenerIdentificadorDelToken(token);
-		return (identifier.equals(userDetails.getUsername()) && !aExpiradoElToken(token));
+	public Boolean validateToken(String token, String expectedSubject) {
+		try {
+			final String identifier = obtenerIdentificadorDelToken(token);
+			return (identifier.equals(expectedSubject) && !haExpiradoElToken(token));
+		} catch (Exception e) {
+			throw new RuntimeException("Error al validar el token JWT", e);
+		}
 	}
-
 }
