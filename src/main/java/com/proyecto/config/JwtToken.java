@@ -76,18 +76,19 @@ public class JwtToken {
 			userMap.put("nombre", paciente.getNombre());
 		}
 		claims.put("usuario", new HashMap<>(userMap));
-		return doGenerateToken(claims);
+		String subject = (medico != null) ? medico.getIdentifier() : paciente.getIdentifier();
+		return doGenerateToken(claims, subject);
 	}
 
-	private String doGenerateToken(Map<String, Object> claims) {
+	private String doGenerateToken(Map<String, Object> claims, String subject) {
 		final Algorithm algorithm = Algorithm.HMAC512(secret);
 		final Instant now = Instant.now();
 		final Instant expirationTime = Instant.now().plus(Duration.ofDays(1));
 		Map<String, Object> usuarioClaims = new HashMap<>();
 		Map<String, Object> originalUsuarioClaims = (Map<String, Object>) claims.get("usuario");
 		usuarioClaims.putAll(originalUsuarioClaims);
-		return JWT.create().withIssuedAt(now).withExpiresAt(expirationTime).withClaim("usuario", usuarioClaims)
-				.sign(algorithm);
+		return JWT.create().withSubject(subject).withIssuedAt(now).withExpiresAt(expirationTime)
+				.withClaim("usuario", usuarioClaims).sign(algorithm);
 	}
 
 	public Boolean validateToken(String token, String expectedSubject) {
