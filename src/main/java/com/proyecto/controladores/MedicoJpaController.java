@@ -37,7 +37,10 @@ import com.proyecto.modelos.Paciente;
 import com.proyecto.serviciosI.ServiciosCitaI;
 import com.proyecto.serviciosI.ServiciosInformeI;
 import com.proyecto.serviciosI.ServiciosMedicoI;
-import com.proyecto.utiles.Transformadores;
+import com.proyecto.utiles.MapeoCita;
+import com.proyecto.utiles.MapeoInformeMedico;
+import com.proyecto.utiles.MapeoMedico;
+import com.proyecto.utiles.MapeoPaciente;
 
 /**
  *
@@ -48,7 +51,13 @@ import com.proyecto.utiles.Transformadores;
 public class MedicoJpaController {
 
 	@Autowired
-	private Transformadores transformador;
+	private MapeoMedico transformador;
+	@Autowired
+	private MapeoCita transformadorCita;
+	@Autowired
+	private MapeoPaciente transformadorPaciente;
+	@Autowired
+	private MapeoInformeMedico transformadorInforme;
 	@Autowired
 	private ServiciosMedicoI sMedico;
 	@Autowired
@@ -106,7 +115,7 @@ public class MedicoJpaController {
 		} catch (ExcepcionServicio ex) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
 		}
-		return listaCitas.stream().map(transformador::convertirADTOC).collect(Collectors.toList());
+		return listaCitas.stream().map(transformadorCita::convertirADTOC).collect(Collectors.toList());
 	}
 
 	@GetMapping("/{nLicencia}/pacientes")
@@ -118,7 +127,7 @@ public class MedicoJpaController {
 		} catch (ExcepcionServicio ex) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
 		}
-		return listaPacientes.stream().map(transformador::convertirADTOP).collect(Collectors.toList());
+		return listaPacientes.stream().map(transformadorPaciente::convertirADTOP).collect(Collectors.toList());
 	}
 
 	@GetMapping("/{especialidad}/{nombrehos}/hospital")
@@ -155,7 +164,6 @@ public class MedicoJpaController {
 		} catch (ExcepcionServicio ex) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
 		}
-		return listaInformes.stream().map(transformador::convertirADTOIM)
-				.collect(Collectors.toList());
+		return listaInformes.stream().map(transformadorInforme::convertirADTOIM).collect(Collectors.toList());
 	}
 }

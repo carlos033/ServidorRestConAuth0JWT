@@ -36,7 +36,10 @@ import com.proyecto.modelos.Paciente;
 import com.proyecto.serviciosI.ServiciosCitaI;
 import com.proyecto.serviciosI.ServiciosInformeI;
 import com.proyecto.serviciosI.ServiciosPacienteI;
-import com.proyecto.utiles.Transformadores;
+import com.proyecto.utiles.MapeoCita;
+import com.proyecto.utiles.MapeoInforme;
+import com.proyecto.utiles.MapeoInformePaciente;
+import com.proyecto.utiles.MapeoPaciente;
 
 /**
  *
@@ -47,7 +50,11 @@ import com.proyecto.utiles.Transformadores;
 public class PacienteJpaController {
 
 	@Autowired
-	private Transformadores transformador;
+	private MapeoPaciente transformador;
+	@Autowired
+	private MapeoCita transformadorCita;
+	@Autowired
+	private MapeoInformePaciente transformadorInformePaciente;
 	@Autowired
 	private ServiciosPacienteI sPaciente;
 	@Autowired
@@ -104,7 +111,7 @@ public class PacienteJpaController {
 			List<Cita> citas = sCita.buscarXPaciente(nSS);
 			if (citas != null) {
 				citas.forEach(cita -> {
-					citasDtos.add(transformador.convertirADTOC(cita));
+					citasDtos.add(transformadorCita.convertirADTOC(cita));
 				});
 			}
 		} catch (ExcepcionServicio ex) {
@@ -122,8 +129,7 @@ public class PacienteJpaController {
 		} catch (ExcepcionServicio ex) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
 		}
-		return listaInformes.stream().map(transformador::convertirADTOIP)
-				.collect(Collectors.toList());
+		return listaInformes.stream().map(transformadorInformePaciente::convertirADTOIP).collect(Collectors.toList());
 	}
 
 }
