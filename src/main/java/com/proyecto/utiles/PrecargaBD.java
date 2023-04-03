@@ -18,6 +18,7 @@ import com.proyecto.modelos.Cita;
 import com.proyecto.modelos.Hospital;
 import com.proyecto.modelos.Informe;
 import com.proyecto.modelos.Medico;
+import com.proyecto.servicios.ServiciosHospital;
 import com.proyecto.servicios.ServiciosMedico;
 
 /**
@@ -29,6 +30,8 @@ public class PrecargaBD {
 
 	@Autowired
 	private ServiciosMedico sMedico;
+	@Autowired
+	private ServiciosHospital sHos;
 
 	@Transactional
 	public void precargarBaseDeDatos() {
@@ -36,10 +39,13 @@ public class PrecargaBD {
 			// lanza excepcion si no lo encuentra, entonces en ese caso precargamos
 			sMedico.buscarMedico("M1");
 		} catch (ExcepcionServicio ex) {
+			List<Medico> listaAdmin = new ArrayList<>();
 			List<Cita> listaCitas = new ArrayList<>();
 			List<Informe> listaInformes = new ArrayList<>();
-
-			Medico m = new Medico("M1", "Admin", "Administrador", 0, "1234", null, listaCitas, listaInformes);
+			Hospital administracion = new Hospital("administracion", "Madrdid", "0", listaAdmin);
+			Medico m = new Medico("M1", "Admin", "Administrador", 0, "1234", administracion, listaCitas, listaInformes);
+			listaAdmin.add(m);
+			sHos.save(administracion);
 			sMedico.saveMedico(m);
 		}
 	}

@@ -1,7 +1,6 @@
 package com.proyecto.utiles;
 
 import org.mapstruct.Mapper;
-
 import com.proyecto.dto.HospitalDTO;
 import com.proyecto.modelos.Hospital;
 
