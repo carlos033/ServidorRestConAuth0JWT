@@ -33,7 +33,7 @@ public class ServiciosMedico implements ServiciosMedicoI {
 	private MedicoRepository repositorioM;
 	@Autowired
 	private HospitalRepository repositorioH;
-	@Autowired
+	@Autowired	
 	private BCryptPasswordEncoder passwordEncoder;
 
 	@Override
