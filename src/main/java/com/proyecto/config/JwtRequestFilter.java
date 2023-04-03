@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,13 +32,11 @@ import com.proyecto.servicios.ServiciosJwtUsuarios;
 public class JwtRequestFilter extends OncePerRequestFilter {
 
 	@Autowired
-	private ServiciosJwtUsuarios jwtUserDetailsService;
+	private JwtToken jwtTokenUtil;
+	private ApplicationContext applicationContext;
 
-	@Autowired
-	private final JwtToken jwtTokenUtil;
-
-	public JwtRequestFilter(JwtToken jwtTokenUtil) {
-		this.jwtTokenUtil = jwtTokenUtil;
+	public JwtRequestFilter(ApplicationContext applicationContext) {
+		this.applicationContext = applicationContext;
 	}
 
 	@Override
@@ -49,14 +48,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
 			jwtToken = requestTokenHeader.substring(7);
 			try {
-				System.out.println(
-						"\n\n" + jwtToken + "\n\n");
 				identifier = jwtTokenUtil.obtenerIdentificadorDelToken(jwtToken);
 			} catch (JWTDecodeException exception) {
 				logger.error("No se pudo obtener el token JWT o el token JWT ha expirado", exception);
 			}
 		}
 		if (identifier != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+			ServiciosJwtUsuarios jwtUserDetailsService = applicationContext.getBean(ServiciosJwtUsuarios.class);
 			UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(identifier);
 			if (jwtTokenUtil.validateToken(jwtToken, identifier)) {
 				UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
