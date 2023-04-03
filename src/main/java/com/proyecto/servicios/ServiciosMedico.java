@@ -11,7 +11,7 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.proyecto.excepciones.ExcepcionServicio;
@@ -34,7 +34,7 @@ public class ServiciosMedico implements ServiciosMedicoI {
 	@Autowired
 	private HospitalRepository repositorioH;
 	@Autowired
-	private PasswordEncoder passwordEncoder;
+	private BCryptPasswordEncoder passwordEncoder;
 
 	@Override
 	public List<Medico> buscarTodosM() {
