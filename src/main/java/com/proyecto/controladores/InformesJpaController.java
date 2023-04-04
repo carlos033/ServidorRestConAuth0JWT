@@ -29,8 +29,7 @@ import com.proyecto.dto.InformeMedicoDTO;
 import com.proyecto.excepciones.ExcepcionServicio;
 import com.proyecto.modelos.Informe;
 import com.proyecto.serviciosI.ServiciosInformeI;
-import com.proyecto.utiles.MapeoInforme;
-import com.proyecto.utiles.MapeoInformeMedico;
+import com.proyecto.utiles.Transformadores;
 
 /**
  *
@@ -41,9 +40,7 @@ import com.proyecto.utiles.MapeoInformeMedico;
 public class InformesJpaController {
 
 	@Autowired
-	private MapeoInforme transformador;
-	@Autowired
-	private MapeoInformeMedico transformadorInformeM;
+	private Transformadores transformador;	
 	@Autowired
 	private ServiciosInformeI sInformes;
 
@@ -59,7 +56,7 @@ public class InformesJpaController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
 		}
 
-		resultado = transformadorInformeM.convertirADTOIM(convertedInforme);
+		resultado = transformador.convertirADTOIM(convertedInforme);
 		return resultado;
 	}
 

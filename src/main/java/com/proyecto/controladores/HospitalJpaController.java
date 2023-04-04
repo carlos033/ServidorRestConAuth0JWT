@@ -28,7 +28,7 @@ import com.proyecto.dto.HospitalDTO;
 import com.proyecto.excepciones.ExcepcionServicio;
 import com.proyecto.modelos.Hospital;
 import com.proyecto.serviciosI.ServiciosHospitalI;
-import com.proyecto.utiles.MapeoHospital;
+import com.proyecto.utiles.Transformadores;
 
 /**
  *
@@ -39,7 +39,7 @@ import com.proyecto.utiles.MapeoHospital;
 public class HospitalJpaController {
 
 	@Autowired
-	private MapeoHospital transformador;
+	private Transformadores transformador;
 	@Autowired
 	private ServiciosHospitalI sHospital;
 
@@ -67,8 +67,7 @@ public class HospitalJpaController {
 	@ResponseBody
 	public List<HospitalDTO> listarhospitales() {
 		List<Hospital> listaHospital = sHospital.buscarTodosH();
-		return listaHospital.stream().map(transformador::convertirADTOH)
-				.collect(Collectors.toList());
+		return listaHospital.stream().map(transformador::convertirADTOH).collect(Collectors.toList());
 	}
 
 	@GetMapping("{nombre}")

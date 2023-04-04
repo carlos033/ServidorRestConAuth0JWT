@@ -20,8 +20,8 @@ import com.proyecto.modelos.Informe;
 public interface InformeRepository extends JpaRepository<Informe, String> {
 
     @Query("Select i from Informe i where i.paciente.nSS = :nSS")
-    public List<Informe> buscarInformeXPaciente(@Param("nSS") String nSS);
+    List<Informe> buscarInformeXPaciente(@Param("nSS") String nSS);
 
     @Query("Select i from Informe i where i.medico.nLicencia = :nLicencia")
-    public List<Informe> buscarInformeXMedico(@Param("nLicencia") String nLicencia);
+    List<Informe> buscarInformeXMedico(@Param("nLicencia") String nLicencia);
 }

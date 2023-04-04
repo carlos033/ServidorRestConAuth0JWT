@@ -20,20 +20,20 @@ import com.proyecto.modelos.Paciente;
  */
 public interface MedicoRepository extends JpaRepository<Medico, String> {
 
-    String BuscarPacientesXMedico = "Select p.listaCitas from Paciente as p join p.listaCitas as pacientecitas "
-            + "join pacientecitas.medico as m where m.nLicencia= :nLicencia ";
+	String BuscarPacientesXMedico = "SELECT DISTINCT p FROM Paciente p JOIN FETCH p.listaCitas c JOIN FETCH c.medico m WHERE m.nLicencia = :nLicencia";
 
-    String BuscarMedicoXEspecialidad = "Select m from Medico as m where m.especialidad = :especialidad and m.hospital.nombreHos = :nombreHospital";
+	String BuscarMedicoXEspecialidad = "SELECT m FROM Medico m JOIN FETCH m.hospital h WHERE m.especialidad = :especialidad AND h.nombreHos = :nombreHospital";
 
-    String Hospital = "Select m from Medico as m where m.hospital.nombreHos = :nombreHospital";
+	String Hospital = "SELECT m FROM Medico m JOIN FETCH m.hospital h WHERE h.nombreHos = :nombreHospital";
 
-    @Query(value = BuscarPacientesXMedico)
-    public List<Paciente> BuscarPacientesXMedico(@Param("nLicencia") String nLicencia);
+	@Query(value = BuscarPacientesXMedico)
+	public List<Paciente> BuscarPacientesXMedico(@Param("nLicencia") String nLicencia);
 
-    @Query(value = BuscarMedicoXEspecialidad)
-    public List<Medico> BuscarMedicoXEspecialidad(@Param("especialidad") String especialidad, @Param("nombreHospital") String hospital);
-    
-    @Query(value = Hospital)
-    public List<Medico> BuscarMedicosXHospital(@Param("nombreHospital") String hospitalNombre);
-    
+	@Query(value = BuscarMedicoXEspecialidad)
+	public List<Medico> BuscarMedicoXEspecialidad(@Param("especialidad") String especialidad,
+			@Param("nombreHospital") String hospital);
+
+	@Query(value = Hospital)
+	public List<Medico> BuscarMedicosXHospital(@Param("nombreHospital") String hospitalNombre);
+
 }

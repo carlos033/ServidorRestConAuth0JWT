@@ -30,8 +30,7 @@ import com.proyecto.excepciones.ExcepcionServicio;
 import com.proyecto.modelos.Cita;
 import com.proyecto.modelos.Medico;
 import com.proyecto.serviciosI.ServiciosCitaI;
-import com.proyecto.utiles.MapeoCita;
-import com.proyecto.utiles.MapeoMedico;
+import com.proyecto.utiles.Transformadores;
 
 /**
  *
@@ -42,10 +41,7 @@ import com.proyecto.utiles.MapeoMedico;
 public class CitasJpaController {
 
 	@Autowired
-	private MapeoCita transformador;
-
-	@Autowired
-	private MapeoMedico transformadorMedico;
+	private Transformadores transformador;
 
 	@Autowired
 	private ServiciosCitaI sCita;
@@ -90,7 +86,7 @@ public class CitasJpaController {
 		Medico m = null;
 		try {
 			m = sCita.buscarMiMedico(nSS);
-			dto = transformadorMedico.convertirADTOM(m);
+			dto = transformador.convertirADTOM(m);
 		} catch (ExcepcionServicio ex) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
 		}
