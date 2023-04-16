@@ -13,28 +13,27 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 public class InformePacienteDTO extends InformeDTO {
 
-	private static final long serialVersionUID = 1L;
-	@JsonIgnoreProperties({ "listaCitas", "listaInformes" })
-	private MedicoDTO medico;
+    @JsonIgnoreProperties("listaInformes")
+    private MedicoDTO medico;
 
-	public InformePacienteDTO() {
-	}
+    public InformePacienteDTO() {
+    }
 
-	public InformePacienteDTO(MedicoDTO medico, String url, String nombreInf) {
-		super(url, nombreInf);
-		this.medico = medico;
-	}
+    public InformePacienteDTO(MedicoDTO medico, String url, String nombreInf) {
+        super(url, nombreInf);
+        this.medico = medico;
+    }
 
-	public MedicoDTO getMedico() {
-		return medico;
-	}
+    public MedicoDTO getMedico() {
+        return medico;
+    }
 
-	public void setMedico(MedicoDTO medico) {
-		this.medico = medico;
-	}
+    public void setMedico(MedicoDTO medico) {
+        this.medico = medico;
+    }
 
-	@Override
-	public String toString() {
-		return "InformePacienteDTO{" + "medico=" + medico + '}';
-	}
+    @Override
+    public String toString() {
+        return "InformePacienteDTO{" + "medico=" + medico + '}';
+    }
 }
