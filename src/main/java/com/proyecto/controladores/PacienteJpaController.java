@@ -37,7 +37,6 @@ import com.proyecto.serviciosI.ServiciosCitaI;
 import com.proyecto.serviciosI.ServiciosInformeI;
 import com.proyecto.serviciosI.ServiciosPacienteI;
 import com.proyecto.utiles.MapeoCita;
-import com.proyecto.utiles.MapeoInforme;
 import com.proyecto.utiles.MapeoInformePaciente;
 import com.proyecto.utiles.MapeoPaciente;
 
