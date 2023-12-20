@@ -5,52 +5,58 @@
  */
 package com.proyecto.servicios;
 
-import com.proyecto.excepciones.ExcepcionServicio;
-import com.proyecto.serviciosI.ServiciosHospitalI;
-import com.proyecto.repositorios.HospitalRepository;
-import com.proyecto.modelos.Hospital;
 import java.util.List;
 import java.util.Optional;
-import javax.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
+
+import com.proyecto.excepciones.ExcepcionServicio;
+import com.proyecto.modelos.Hospital;
+import com.proyecto.repositorios.HospitalRepository;
+import com.proyecto.serviciosI.ServiciosHospitalI;
+
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 
 /**
  *
  * @author ck
  */
-@Service("ServiciosHospitalI")
+@AllArgsConstructor
+@Service
 @Transactional
 public class ServiciosHospital implements ServiciosHospitalI {
 
-    @Autowired
-    private HospitalRepository repositorioH;
+	private HospitalRepository repositorioH;
 
-    @Override
-    public List<Hospital> buscarTodosH() {
-        return repositorioH.findAll();
-    }
+	@Override
+	public List<Hospital> buscarTodosH() {
+		return repositorioH.findAll();
+	}
 
-    @Override
-    public void save(Hospital hospital1) {
-        repositorioH.save(hospital1);
-    }
+	@Override
+	public void save(Hospital hospital1) {
+		repositorioH.save(hospital1);
+	}
 
-    @Override
-    public void eliminarHospital(String nombre) throws ExcepcionServicio {
-        Optional<Hospital> optHospital = repositorioH.findById(nombre);
-        if (!optHospital.isPresent()) {
-            throw new ExcepcionServicio("El hospital no existe");
-        }
-        repositorioH.deleteById(nombre);
-    }
+	@Override
+	public void eliminarHospital(String nombre) throws ExcepcionServicio {
+		Optional<Hospital> optHospital = repositorioH.findById(nombre);
+		if (optHospital.isPresent()) {
+			repositorioH.deleteById(nombre);
+		}
+		throw new ExcepcionServicio("El hospital no existe");
 
-    @Override
-    public Optional<Hospital> buscarHospital(String nombre) throws ExcepcionServicio {
-        Optional<Hospital> optHospital = repositorioH.findById(nombre);
-        if (!optHospital.isPresent()) {
-            throw new ExcepcionServicio("El hospital no existe");
-        }
-        return optHospital;
-    }
+	}
+
+	@Override
+	public Optional<Hospital> buscarHospital(String nombre) throws ExcepcionServicio {
+		Optional<Hospital> optHospital = repositorioH.findById(nombre);
+		if (optHospital.isPresent()) {
+			return optHospital;
+
+		}
+		throw new ExcepcionServicio("El hospital no existe");
+
+	}
 }

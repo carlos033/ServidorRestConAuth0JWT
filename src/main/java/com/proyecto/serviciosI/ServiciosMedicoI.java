@@ -18,17 +18,18 @@ import com.proyecto.modelos.Paciente;
  */
 public interface ServiciosMedicoI {
 
-    public List<Medico> buscarTodosM();
+	public List<Medico> buscarTodosM();
 
-    public void saveMedico(Medico medico1);
+	public void saveMedico(Medico medico1);
 
-    public void eliminarMedico(String nLicencia) throws ExcepcionServicio;
+	public void eliminarMedico(String nLicencia) throws ExcepcionServicio;
 
-    public Optional<Medico> buscarMedico(String nLicencia) throws ExcepcionServicio;
+	public Optional<Medico> buscarMedico(String nLicencia) throws ExcepcionServicio;
 
-    public List<Paciente> BuscarPacientesXMedico(String nLicencia) throws ExcepcionServicio;
+	public List<Paciente> BuscarPacientesXMedico(String nLicencia) throws ExcepcionServicio;
 
-    public List<Medico> BuscarMedicoXEspecialidad(String especialidad, String hospital) throws ExcepcionServicio;
+	public List<Medico> BuscarMedicoXEspecialidad(String especialidad, String hospital) throws ExcepcionServicio;
 
-    public List<Medico> BuscarMedicosXHospital(String hospital) throws ExcepcionServicio;
+	public List<Medico> BuscarMedicosXHospital(String hospital) throws ExcepcionServicio;
+
 }

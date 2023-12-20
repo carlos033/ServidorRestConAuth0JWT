@@ -8,8 +8,6 @@ package com.proyecto.utiles;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +18,8 @@ import com.proyecto.modelos.Informe;
 import com.proyecto.modelos.Medico;
 import com.proyecto.servicios.ServiciosHospital;
 import com.proyecto.servicios.ServiciosMedico;
+
+import jakarta.transaction.Transactional;
 
 /**
  *

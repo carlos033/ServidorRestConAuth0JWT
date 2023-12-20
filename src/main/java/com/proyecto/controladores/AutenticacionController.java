@@ -6,11 +6,7 @@
 package com.proyecto.controladores;
 
 import java.util.Collection;
-import java.util.Optional;
 
-import javax.transaction.Transactional;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,11 +25,12 @@ import org.springframework.web.server.ResponseStatusException;
 import com.proyecto.config.JwtToken;
 import com.proyecto.dto.jwt.JwtRequest;
 import com.proyecto.dto.jwt.JwtResponse;
-import com.proyecto.modelos.Medico;
-import com.proyecto.modelos.Paciente;
 import com.proyecto.servicios.ServiciosJwtUsuarios;
 import com.proyecto.servicios.ServiciosMedico;
 import com.proyecto.servicios.ServiciosPaciente;
+
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 
 /**
  *
@@ -42,21 +39,17 @@ import com.proyecto.servicios.ServiciosPaciente;
 @RestController
 @CrossOrigin
 @RequestMapping("/autenticacion")
+@AllArgsConstructor
 public class AutenticacionController {
 
-	@Autowired
 	private AuthenticationManager authenticationManager;
 
-	@Autowired
 	private JwtToken jwtToken;
 
-	@Autowired
 	private ServiciosJwtUsuarios jwtUserDetailsService;
 
-	@Autowired
 	private ServiciosMedico sMedico;
 
-	@Autowired
 	private ServiciosPaciente sPaciente;
 
 	@PostMapping("/login")
@@ -66,25 +59,21 @@ public class AutenticacionController {
 				.loadUserByUsername(authenticationRequest.getIdentificador());
 		authenticate(authenticationRequest.getIdentificador(), authenticationRequest.getPassword(),
 				userDetails.getAuthorities());
-		String token = "";
-		if (authenticationRequest.getIdentificador().toUpperCase().startsWith("M")) {
-			Optional<Medico> optMedico = sMedico.buscarMedico(authenticationRequest.getIdentificador());
-			if (optMedico.isPresent()) {
-				token = jwtToken.generarToken(optMedico.get());
-			} else {
-				throw new Exception(
-						"No se encontró el médico con identificador " + authenticationRequest.getIdentificador());
-			}
-		} else if (authenticationRequest.getIdentificador().toUpperCase().startsWith("ES")) {
-			Optional<Paciente> optPaciente = sPaciente.buscarPaciente(authenticationRequest.getIdentificador());
-			if (optPaciente.isPresent()) {
-				token = jwtToken.generarToken(optPaciente.get());
-			} else {
-				throw new Exception(
-						"No se encontró el paciente con identificador " + authenticationRequest.getIdentificador());
-			}
-		}
+
+		String token = generateToken(authenticationRequest.getIdentificador());
 		return ResponseEntity.ok(new JwtResponse(token));
+	}
+
+	private String generateToken(String identificador) throws Exception {
+		if (identificador.toUpperCase().startsWith("M")) {
+			return sMedico.buscarMedico(identificador).map(jwtToken::generarToken)
+					.orElseThrow(() -> new Exception("No se encontró el médico con identificador " + identificador));
+		} else if (identificador.toUpperCase().startsWith("ES")) {
+			return sPaciente.buscarPaciente(identificador).map(jwtToken::generarToken)
+					.orElseThrow(() -> new Exception("No se encontró el paciente con identificador " + identificador));
+		} else {
+			throw new Exception("Tipo de identificador no soportado");
+		}
 	}
 
 	@Transactional

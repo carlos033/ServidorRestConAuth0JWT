@@ -20,12 +20,8 @@ import com.proyecto.modelos.Paciente;
 
 @Component
 public class JwtToken {
-
-	private final String secret;
-
-	public JwtToken(@Value("${jwt.secret}") String secret) {
-		this.secret = secret;
-	}
+	@Value("${jwt.secret}")
+	private String secret;
 
 	public String obtenerIdentificadorDelToken(String token) {
 		return getClaimFromToken(token, DecodedJWT::getSubject);
@@ -43,8 +39,7 @@ public class JwtToken {
 	private DecodedJWT decodeToken(String token) {
 		try {
 			JWTVerifier verifier = JWT.require(Algorithm.HMAC512(secret)).build();
-			DecodedJWT jwt = verifier.verify(token);
-			return jwt;
+			return verifier.verify(token);
 		} catch (JWTDecodeException exception) {
 			throw new RuntimeException("Error decodificando el token", exception);
 		}
@@ -64,31 +59,34 @@ public class JwtToken {
 	public String generarToken(Logable user) {
 		final Map<String, Object> claims = new HashMap<>();
 		final Map<String, Object> userMap = new HashMap<>();
-		Medico medico = null;
-		Paciente paciente = null;
 		if (user instanceof Medico) {
 			userMap.put("licencia", user.getIdentifier());
-			medico = (Medico) user;
+			Medico medico = (Medico) user;
 			userMap.put("nombre", medico.getNombre());
 		} else if (user instanceof Paciente) {
 			userMap.put("nss", user.getIdentifier());
-			paciente = (Paciente) user;
+			Paciente paciente = (Paciente) user;
 			userMap.put("nombre", paciente.getNombre());
 		}
 		claims.put("usuario", new HashMap<>(userMap));
-		String subject = (medico != null) ? medico.getIdentifier() : paciente.getIdentifier();
+		String subject = (user instanceof Medico) ? ((Medico) user).getIdentifier() : ((Paciente) user).getIdentifier();
 		return doGenerateToken(claims, subject);
 	}
 
 	private String doGenerateToken(Map<String, Object> claims, String subject) {
 		final Algorithm algorithm = Algorithm.HMAC512(secret);
 		final Instant now = Instant.now();
-		final Instant expirationTime = Instant.now().plus(Duration.ofDays(1));
-		Map<String, Object> usuarioClaims = new HashMap<>();
-		Map<String, Object> originalUsuarioClaims = (Map<String, Object>) claims.get("usuario");
-		usuarioClaims.putAll(originalUsuarioClaims);
-		return JWT.create().withSubject(subject).withIssuedAt(now).withExpiresAt(expirationTime)
-				.withClaim("usuario", usuarioClaims).sign(algorithm);
+		final Instant expirationTime = now.plus(Duration.ofDays(1));
+		Object usuarioClaimsObj = claims.get("usuario");
+		if (usuarioClaimsObj instanceof Map) {
+			@SuppressWarnings("unchecked")
+			Map<String, Object> usuarioClaims = (Map<String, Object>) usuarioClaimsObj;
+
+			return JWT.create().withSubject(subject).withIssuedAt(now).withExpiresAt(expirationTime)
+					.withClaim("usuario", usuarioClaims).sign(algorithm);
+		} else {
+			throw new RuntimeException("El objeto 'usuario' no es del tipo esperado (Map<String, Object>)");
+		}
 	}
 
 	public Boolean validateToken(String token, String expectedSubject) {

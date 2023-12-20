@@ -8,9 +8,6 @@ package com.proyecto.servicios;
 import java.util.List;
 import java.util.Optional;
 
-import javax.transaction.Transactional;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,18 +19,21 @@ import com.proyecto.repositorios.HospitalRepository;
 import com.proyecto.repositorios.MedicoRepository;
 import com.proyecto.serviciosI.ServiciosMedicoI;
 
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
+
 /**
  *
  * @author ck
  */
-@Service("ServiciosMedicoI")
+@AllArgsConstructor
+@Service()
 public class ServiciosMedico implements ServiciosMedicoI {
 
-	@Autowired
 	private MedicoRepository repositorioM;
-	@Autowired
+
 	private HospitalRepository repositorioH;
-	@Autowired	
+
 	private BCryptPasswordEncoder passwordEncoder;
 
 	@Override
@@ -51,19 +51,22 @@ public class ServiciosMedico implements ServiciosMedicoI {
 	@Override
 	public void eliminarMedico(String nLicencia) throws ExcepcionServicio {
 		Optional<Medico> optMedico = repositorioM.findById(nLicencia);
-		if (!optMedico.isPresent()) {
-			throw new ExcepcionServicio("El numero de Licencia no existe");
+		if (optMedico.isPresent()) {
+			repositorioM.deleteById(nLicencia);
+
 		}
-		repositorioM.deleteById(nLicencia);
+		throw new ExcepcionServicio("El numero de Licencia no existe");
+
 	}
 
 	@Override
 	public Optional<Medico> buscarMedico(String nLicencia) throws ExcepcionServicio {
 		Optional<Medico> optMedico = repositorioM.findById(nLicencia);
-		if (!optMedico.isPresent()) {
-			throw new ExcepcionServicio("El numero de Licencia no existe");
+		if (optMedico.isPresent()) {
+			return optMedico;
 		}
-		return optMedico;
+		throw new ExcepcionServicio("El numero de Licencia no existe");
+
 	}
 
 	@Override

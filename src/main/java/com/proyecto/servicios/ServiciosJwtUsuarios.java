@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -21,34 +21,38 @@ import com.proyecto.repositorios.MedicoRepository;
 import com.proyecto.repositorios.PacienteRepository;
 import com.proyecto.serviciosI.ServicioJwtUsuario;
 
+import lombok.AllArgsConstructor;
+
 /**
  *
  * @author ck
  */
+@AllArgsConstructor
 @Service
 public class ServiciosJwtUsuarios implements ServicioJwtUsuario {
 
-	@Autowired
 	private MedicoRepository medicoRepository;
 
-	@Autowired
 	private PacienteRepository pacienteRepository;
 
 	private UserDetails cargarMedicoPorIdentificador(String identificador) {
 		Optional<Medico> optMedico = medicoRepository.findById(identificador);
-		if (!optMedico.isPresent()) {
-			throw new UsernameNotFoundException("Usuario no encontrado con identificador: " + identificador);
+		if (optMedico.isPresent()) {
+			Medico m = optMedico.get();
+			List<GrantedAuthority> authorities = new ArrayList<>();
+			return new User(m.getnLicencia(), m.getPassword(), authorities);
 		}
-		Medico m = optMedico.get();
-		List<GrantedAuthority> authorities = new ArrayList<>();
-		return new org.springframework.security.core.userdetails.User(m.getnLicencia(), m.getPassword(), authorities);
+		throw new UsernameNotFoundException("Usuario no encontrado con identificador: " + identificador);
+
 	}
 
 	private UserDetails cargarPacientePorIdentificador(String identificador) {
 		Optional<Paciente> optPaciente = pacienteRepository.findById(identificador);
-		Paciente p = optPaciente.get();
-		List<GrantedAuthority> authorities = new ArrayList<>();
-		return new org.springframework.security.core.userdetails.User(p.getnSS(), p.getPassword(), authorities);
+		if (optPaciente.isPresent()) {
+			Paciente p = optPaciente.get();
+			return new User(p.getNSS(), p.getPassword(), new ArrayList<>());
+		}
+		throw new UsernameNotFoundException("Usuario no encontrado con identificador: " + identificador);
 	}
 
 	@Override

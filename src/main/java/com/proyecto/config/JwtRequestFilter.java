@@ -7,12 +7,6 @@ package com.proyecto.config;
 
 import java.io.IOException;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,20 +18,22 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.proyecto.servicios.ServiciosJwtUsuarios;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
+
 /**
  *
  * @author ck
  */
 @Component
+@AllArgsConstructor
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-	@Autowired
 	private JwtToken jwtTokenUtil;
 	private ApplicationContext applicationContext;
-
-	public JwtRequestFilter(ApplicationContext applicationContext) {
-		this.applicationContext = applicationContext;
-	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -45,25 +41,47 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		final String requestTokenHeader = request.getHeader("Authorization");
 		String identifier = null;
 		String jwtToken = null;
+
 		if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
 			jwtToken = requestTokenHeader.substring(7);
+
 			try {
 				identifier = jwtTokenUtil.obtenerIdentificadorDelToken(jwtToken);
 			} catch (JWTDecodeException exception) {
 				logger.error("No se pudo obtener el token JWT o el token JWT ha expirado", exception);
 			}
 		}
-		if (identifier != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-			ServiciosJwtUsuarios jwtUserDetailsService = applicationContext.getBean(ServiciosJwtUsuarios.class);
-			UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(identifier);
-			if (jwtTokenUtil.validateToken(jwtToken, identifier)) {
-				UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-						userDetails, null, userDetails.getAuthorities());
-				usernamePasswordAuthenticationToken
-						.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-			}
+
+		if (shouldAuthenticate(identifier, jwtToken)) {
+			authenticateAndSetSecurityContext(request, identifier, jwtToken);
 		}
+
 		chain.doFilter(request, response);
 	}
+
+	private boolean shouldAuthenticate(String identifier, String jwtToken) {
+		return identifier != null && SecurityContextHolder.getContext().getAuthentication() == null
+				&& jwtTokenUtil.validateToken(jwtToken, identifier);
+	}
+
+	private void authenticateAndSetSecurityContext(HttpServletRequest request, String identifier, String jwtToken) {
+		ServiciosJwtUsuarios jwtUserDetailsService = applicationContext.getBean(ServiciosJwtUsuarios.class);
+		UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(identifier);
+
+		if (isTokenValid(jwtToken, identifier)) {
+			setAuthenticationInSecurityContext(request, userDetails);
+		}
+	}
+
+	private boolean isTokenValid(String jwtToken, String identifier) {
+		return jwtTokenUtil.validateToken(jwtToken, identifier);
+	}
+
+	private void setAuthenticationInSecurityContext(HttpServletRequest request, UserDetails userDetails) {
+		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails,
+				null, userDetails.getAuthorities());
+		authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+		SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+	}
+
 }
